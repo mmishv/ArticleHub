@@ -5,20 +5,22 @@ from fastapi import FastAPI, Depends
 from fastapi.security import HTTPBasicCredentials, HTTPBasic
 from jose import jwt
 
-from common.database import users_collection, tokens_collection
+from common.database import get_user_collection, get_token_collection
 from .exceptions import UserAlreadyExistsException, InvalidCredentialsException
 from .models import User, UserCreate
 from .utils.token_utils import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES, create_access_token, \
     create_tokens_for_user
 
 from .utils.user_utils import get_user_by_email, authenticate_user
-
+from .crud_router import router as user_router
 app = FastAPI()
+
+app.include_router(user_router)
 
 
 @app.post("/register/")
 async def register_user(user: UserCreate):
-    existing_user = users_collection.find_one({"email": user.email})
+    existing_user = get_user_collection().find_one({"email": user.email})
     if existing_user:
         raise UserAlreadyExistsException(user.email)
 
@@ -29,7 +31,7 @@ async def register_user(user: UserCreate):
     user_data = {"email": user.email, "hashed_password": password_hash, "first_name": user.first_name,
                  "last_name": user.last_name, "is_active": True, "is_superuser": False, }
 
-    users_collection.insert_one(user_data)
+    get_user_collection().insert_one(user_data)
 
     access_token, refresh_token = create_tokens_for_user(User(**user_data))
     user = User(**user_data)
@@ -73,5 +75,5 @@ async def read_users_me(current_user: User = Depends(get_user_by_email)):
 
 @app.post("/logout/")
 async def logout(email: str):
-    tokens_collection.delete_one({"email": email})
+    get_token_collection().delete_one({"email": email})
     return {"message": "Successfully logged out"}

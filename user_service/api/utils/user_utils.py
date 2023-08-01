@@ -4,14 +4,14 @@ import bcrypt
 from fastapi import Depends, HTTPException
 from fastapi.security import HTTPBasicCredentials, HTTPBasic
 
-from common.database import users_collection
+from common.database import get_user_collection
 from user_service.api.models import User
 
 security = HTTPBasic()
 
 
 def get_user_by_email(email: str) -> Optional[User]:
-    user_data = users_collection.find_one({"email": email})
+    user_data = get_user_collection().find_one({"email": email})
     if user_data:
         user = User(**user_data)
         return user
@@ -20,7 +20,7 @@ def get_user_by_email(email: str) -> Optional[User]:
 
 
 def authenticate_user(email: str, password: str) -> Optional[User]:
-    user_data = users_collection.find_one({"email": email})
+    user_data = get_user_collection().find_one({"email": email})
     if user_data and bcrypt.checkpw(password.encode('utf-8'), user_data["hashed_password"].encode('utf-8')):
         user = User(**user_data)
         return user

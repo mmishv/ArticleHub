@@ -3,7 +3,7 @@ from typing import Optional
 
 from jose import jwt
 
-from common.database import tokens_collection
+from common.database import get_token_collection
 from ..models import User
 
 SECRET_KEY = "1111"
@@ -44,6 +44,6 @@ def create_tokens_for_user(user: User):
         "access_token": access_token,
         "refresh_token": refresh_token,
     }
-    tokens_collection.insert_one(token_data)
+    get_token_collection().insert_one(token_data)
 
     return access_token, refresh_token
