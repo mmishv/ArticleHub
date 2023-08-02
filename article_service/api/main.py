@@ -80,7 +80,7 @@ async def delete_article_by_author(article_id: str, author_email: str):
     return {"message": "Article deleted successfully"}
 
 
-@app.on_event("startup")
-async def startup_event():
-    scheduler.add_job(send_daily_report, 'interval', days=1, start_date='2023-08-01 00:00:00',
-                      args=[count_published_articles])
+# @app.on_event("startup")
+# async def startup_event():
+#     scheduler.add_job(send_daily_report, 'interval', days=1, start_date='2023-08-01 00:00:00',
+#                       args=[count_published_articles])

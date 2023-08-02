@@ -30,6 +30,6 @@ def handle_article_notification(ch, method, properties, body):
         publish_article_notification(article_id)
 
 
-channel.basic_consume(queue=RABBITMQ_ARTICLE_QUEUE, on_message_callback=handle_article_notification, auto_ack=True)
-print("Waiting for article notifications. To exit press CTRL+C")
-channel.start_consuming()
+# channel.basic_consume(queue=RABBITMQ_ARTICLE_QUEUE, on_message_callback=handle_article_notification, auto_ack=True)
+# print("Waiting for article notifications. To exit press CTRL+C")
+# channel.start_consuming()
