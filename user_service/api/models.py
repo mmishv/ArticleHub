@@ -15,3 +15,7 @@ class UserCreate(BaseModel):
     password: str
     first_name: str
     last_name: str
+
+
+class RefreshTokenInput(BaseModel):
+    refresh_token: str

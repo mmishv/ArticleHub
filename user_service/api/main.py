@@ -7,11 +7,11 @@ from jose import jwt
 
 from common.database import get_user_collection, get_token_collection
 from .exceptions import UserAlreadyExistsException, InvalidCredentialsException
-from .models import User, UserCreate
+from .models import User, UserCreate, RefreshTokenInput
 from .utils.token_utils import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES, create_access_token, \
     create_tokens_for_user
 
-from .utils.user_utils import get_user_by_email, authenticate_user
+from .utils.user_utils import get_user_by_email, authenticate_user, get_current_user
 from .crud_router import router as user_router
 app = FastAPI()
 
@@ -19,7 +19,7 @@ app.include_router(user_router)
 
 
 @app.post("/register/")
-async def register_user(user: UserCreate):
+def register_user(user: UserCreate):
     existing_user = get_user_collection().find_one({"email": user.email})
     if existing_user:
         raise UserAlreadyExistsException(user.email)
@@ -39,9 +39,9 @@ async def register_user(user: UserCreate):
 
 
 @app.post("/token/")
-async def login_for_access_token(refresh_token: str):
+def login_for_access_token(refresh_token: RefreshTokenInput):
     try:
-        decoded_token = jwt.decode(refresh_token, SECRET_KEY, algorithms=[ALGORITHM])
+        decoded_token = jwt.decode(refresh_token.refresh_token, SECRET_KEY, algorithms=[ALGORITHM])
     except jwt.JWTError:
         raise InvalidCredentialsException()
 
@@ -59,7 +59,7 @@ async def login_for_access_token(refresh_token: str):
 
 
 @app.post("/login/")
-async def login(credentials: HTTPBasicCredentials = Depends(HTTPBasic())):
+def login(credentials: HTTPBasicCredentials = Depends(HTTPBasic())):
     user = authenticate_user(credentials.username, credentials.password)
     if user is None:
         raise InvalidCredentialsException()
@@ -69,11 +69,11 @@ async def login(credentials: HTTPBasicCredentials = Depends(HTTPBasic())):
 
 
 @app.get("/me/")
-async def read_users_me(current_user: User = Depends(get_user_by_email)):
+def read_users_me(current_user: User = Depends(get_current_user)):
     return current_user
 
 
-@app.post("/logout/")
-async def logout(email: str):
+@app.post("/logout/{email}")
+def logout(email: str):
     get_token_collection().delete_one({"email": email})
     return {"message": "Successfully logged out"}

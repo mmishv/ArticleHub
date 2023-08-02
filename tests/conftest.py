@@ -15,3 +15,10 @@ def enable_test_mode():
 @pytest.fixture
 def db(enable_test_mode):
     return get_database()
+
+
+@pytest.fixture(autouse=True)
+def cleanup_database(db):
+    db.client.drop_database(db.name)
+    yield
+    db.client.drop_database(db.name)
