@@ -5,7 +5,7 @@ from common.database import get_user_collection, get_database
 from .models import User
 
 
-async def create_user(user: User, ) -> User:
+def create_user(user: User, ) -> User:
     user_data = {
         "email": user.email,
         "hashed_password": user.hashed_password,
@@ -18,7 +18,7 @@ async def create_user(user: User, ) -> User:
     return user
 
 
-async def get_user_by_id(user_id: str) -> Optional[User]:
+def get_user_by_id(user_id: str) -> Optional[User]:
     user_data = get_user_collection().find_one({"_id": ObjectId(user_id)})
     if user_data:
         user = User(**user_data)
@@ -27,7 +27,7 @@ async def get_user_by_id(user_id: str) -> Optional[User]:
         return None
 
 
-async def get_user_by_email(email: str) -> Optional[User]:
+def get_user_by_email(email: str) -> Optional[User]:
     user_data = get_user_collection().find_one({"email": email})
     if user_data:
         user = User(**user_data)
@@ -36,13 +36,13 @@ async def get_user_by_email(email: str) -> Optional[User]:
         return None
 
 
-async def get_all_users() -> List[User]:
+def get_all_users() -> List[User]:
     users_data = get_user_collection().find()
     users = [User(**user) for user in users_data]
     return users
 
 
-async def update_user(user_id: str, updated_data: dict) -> Optional[User]:
+def update_user(user_id: str, updated_data: dict) -> Optional[User]:
     result = get_user_collection().update_one(
         {"_id": ObjectId(user_id)}, {"$set": updated_data}
     )
@@ -53,6 +53,6 @@ async def update_user(user_id: str, updated_data: dict) -> Optional[User]:
         return None
 
 
-async def delete_user(user_id: str) -> bool:
+def delete_user(user_id: str) -> bool:
     result = get_user_collection().delete_one({"_id": ObjectId(user_id)})
     return result.deleted_count == 1
