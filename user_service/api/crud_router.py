@@ -2,7 +2,7 @@ from typing import List
 
 from fastapi import APIRouter, HTTPException
 
-from user_service.api.crud import create_user, get_user_by_id, get_user_by_email, get_all_users, update_user, \
+from user_service.api.utils.crud import create_user, get_user_by_id, get_user_by_email, get_all_users, update_user, \
     delete_user
 from user_service.api.models import User
 

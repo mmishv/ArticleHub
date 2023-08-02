@@ -1,10 +1,11 @@
+import pika
 from apscheduler.schedulers.background import BackgroundScheduler
 from fastapi import FastAPI, HTTPException
+import json
 
+from common.settings import HOST
 from .crud import (create_article, get_article_by_id, get_articles, update_article, delete_article, )
 from .models import Article
-from .utils.article_utils import count_published_articles
-from .utils.daily_report import send_daily_report
 
 app = FastAPI()
 scheduler = BackgroundScheduler()
@@ -12,6 +13,14 @@ scheduler = BackgroundScheduler()
 
 @app.post("/articles/", response_model=Article)
 async def create_new_article(article: Article):
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host=HOST))
+    channel = connection.channel()
+    message = {
+        "author": article.author_email,
+        "article_title": article.title
+    }
+    channel.basic_publish(exchange='', routing_key='article_notifications', body=json.dumps(message).encode('utf-8'))
+    connection.close()
     return create_article(article)
 
 
@@ -78,9 +87,3 @@ async def delete_article_by_author(article_id: str, author_email: str):
 
     delete_article(article_id)
     return {"message": "Article deleted successfully"}
-
-
-# @app.on_event("startup")
-# async def startup_event():
-#     scheduler.add_job(send_daily_report, 'interval', days=1, start_date='2023-08-01 00:00:00',
-#                       args=[count_published_articles])

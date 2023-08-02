@@ -2,7 +2,7 @@ from bson import ObjectId
 from typing import Optional, List
 
 from common.database import get_user_collection, get_database
-from .models import User
+from user_service.api.models import User
 
 
 def create_user(user: User, ) -> User:

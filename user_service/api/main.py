@@ -1,3 +1,5 @@
+import atexit
+import threading
 from datetime import timedelta
 
 import bcrypt
@@ -6,6 +8,7 @@ from fastapi.security import HTTPBasicCredentials, HTTPBasic
 from jose import jwt
 
 from common.database import get_user_collection, get_token_collection
+from user_service.api.article_notifications import listen_to_article_notifications
 from .exceptions import UserAlreadyExistsException, InvalidCredentialsException
 from .models import User, UserCreate, RefreshTokenInput
 from .utils.token_utils import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES, create_access_token, \
@@ -17,6 +20,10 @@ app = FastAPI()
 
 app.include_router(user_router)
 
+notification_thread = threading.Thread(target=listen_to_article_notifications)
+notification_thread.start()
+
+atexit.register(notification_thread.join)
 
 @app.post("/register/")
 def register_user(user: UserCreate):
@@ -77,3 +84,6 @@ def read_users_me(current_user: User = Depends(get_current_user)):
 def logout(email: str):
     get_token_collection().delete_one({"email": email})
     return {"message": "Successfully logged out"}
+
+
+
