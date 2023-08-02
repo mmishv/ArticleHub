@@ -1,1 +1,1 @@
-from tests.conftest import db, enable_test_mode
+from tests.conftest import db, enable_test_mode, cleanup_database
