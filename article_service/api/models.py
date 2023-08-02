@@ -4,6 +4,7 @@ from datetime import datetime
 
 
 class Article(BaseModel):
+    id: Optional[str] = ''
     title: str
     content: str
     author_email: EmailStr

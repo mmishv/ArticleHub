@@ -15,8 +15,7 @@ def create_article(article: Article) -> Article:
         "created_at": datetime.utcnow(),
         "is_published": article.is_published,
     }
-    result = get_article_collection().insert_one(article_data)
-    article.id = str(result.inserted_id)
+    article.id = str(get_article_collection().insert_one(article_data).inserted_id)
     if article.is_published:
         publish_article_notification(article.id)
     return article

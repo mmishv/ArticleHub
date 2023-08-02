@@ -36,12 +36,12 @@ async def update_article_by_id(article_id: str, updated_data: Article):
     return article
 
 
-@app.delete("/articles/{article_id}", response_model=Article)
+@app.delete("/articles/{article_id}")
 async def delete_article_by_id(article_id: str):
     article = delete_article(article_id)
     if article is None:
         raise HTTPException(status_code=404, detail="Article not found")
-    return article
+    return {"message": "Article deleted successfully"}
 
 
 @app.put("/articles/{article_id}/publish/", response_model=Article)
