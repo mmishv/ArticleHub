@@ -3,7 +3,7 @@ from typing import List, Optional
 from datetime import datetime
 
 from common.database import get_article_collection
-from common.rabbitmq import channel, publish_article_notification
+from common.rabbitmq import channel
 from .models import Article
 
 
@@ -15,9 +15,7 @@ def create_article(article: Article) -> Article:
         "created_at": datetime.utcnow(),
         "is_published": article.is_published,
     }
-    article.id = str(get_article_collection().insert_one(article_data).inserted_id)
-    if article.is_published:
-        publish_article_notification(article.id)
+    get_article_collection().insert_one(article_data)
     return article
 
 

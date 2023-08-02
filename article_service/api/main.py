@@ -6,6 +6,7 @@ import json
 from common.settings import HOST
 from .crud import (create_article, get_article_by_id, get_articles, update_article, delete_article, )
 from .models import Article
+from .utils.count_utils import count_published_articles_last_5_minutes
 
 app = FastAPI()
 scheduler = BackgroundScheduler()
@@ -13,14 +14,15 @@ scheduler = BackgroundScheduler()
 
 @app.post("/articles/", response_model=Article)
 async def create_new_article(article: Article):
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host=HOST))
-    channel = connection.channel()
-    message = {
-        "author": article.author_email,
-        "article_title": article.title
-    }
-    channel.basic_publish(exchange='', routing_key='article_notifications', body=json.dumps(message).encode('utf-8'))
-    connection.close()
+    if article.is_published:
+        connection = pika.BlockingConnection(pika.ConnectionParameters(host=HOST))
+        channel = connection.channel()
+        message = {
+            "author": article.author_email,
+            "article_title": article.title
+        }
+        channel.basic_publish(exchange='', routing_key='article_notifications', body=json.dumps(message).encode('utf-8'))
+        connection.close()
     return create_article(article)
 
 
@@ -87,3 +89,8 @@ async def delete_article_by_author(article_id: str, author_email: str):
 
     delete_article(article_id)
     return {"message": "Article deleted successfully"}
+
+
+@app.get("/article_count_last_5_minutes")
+def get_article_count_last_5_minutes():
+    return {"article_count": count_published_articles_last_5_minutes()}

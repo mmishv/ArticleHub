@@ -8,7 +8,7 @@ from fastapi.security import HTTPBasicCredentials, HTTPBasic
 from jose import jwt
 
 from common.database import get_user_collection, get_token_collection
-from user_service.api.article_notifications import listen_to_article_notifications
+from user_service.api.utils.article_notifications import listen_to_article_notifications
 from .exceptions import UserAlreadyExistsException, InvalidCredentialsException
 from .models import User, UserCreate, RefreshTokenInput
 from .utils.token_utils import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES, create_access_token, \
@@ -24,6 +24,7 @@ notification_thread = threading.Thread(target=listen_to_article_notifications)
 notification_thread.start()
 
 atexit.register(notification_thread.join)
+
 
 @app.post("/register/")
 def register_user(user: UserCreate):
