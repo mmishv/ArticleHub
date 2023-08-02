@@ -16,6 +16,7 @@ from .utils.token_utils import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTE
 
 from .utils.user_utils import get_user_by_email, authenticate_user, get_current_user
 from .crud_router import router as user_router
+from .celery_app import send_article_count_notifications
 app = FastAPI()
 
 app.include_router(user_router)
@@ -24,6 +25,12 @@ notification_thread = threading.Thread(target=listen_to_article_notifications)
 notification_thread.start()
 
 atexit.register(notification_thread.join)
+
+
+@app.on_event("startup")
+def startup_event():
+    print('Start sending count notifications')
+    send_article_count_notifications.apply_async()
 
 
 @app.post("/register/")
