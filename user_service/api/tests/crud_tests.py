@@ -2,12 +2,12 @@ from bson import ObjectId
 from starlette.testclient import TestClient
 
 from common.database import USER_COLLECTION_NAME
-from common.settings import BASE_URL
+from common.settings import USER_BASE_URL
 from user_service.api.main import app
 from user_service.api.models import User
 
 
-client = TestClient(app, base_url=BASE_URL)
+client = TestClient(app, base_url=USER_BASE_URL)
 
 user_data = {"email": "test@example.com",
              "hashed_password": "testpassword",

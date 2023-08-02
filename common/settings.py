@@ -1,3 +1,7 @@
 HOST = 'localhost'
-PORT = 8000
-BASE_URL = f"http://{HOST}:{PORT}"
+
+USER_PORT = 8000
+USER_BASE_URL = f"http://{HOST}:{USER_PORT}"
+
+ARTICLE_PORT = 8001
+ARTICLE_BASE_URL = f"http://{HOST}:{ARTICLE_PORT}"

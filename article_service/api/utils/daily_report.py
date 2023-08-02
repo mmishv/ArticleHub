@@ -5,7 +5,7 @@ from email.mime.text import MIMEText
 import httpx
 
 from article_service.api.utils.article_utils import count_published_articles
-from common.settings import HOST, PORT
+from common.settings import HOST, USER_PORT
 
 
 def send_daily_report():
@@ -15,7 +15,7 @@ def send_daily_report():
     smtp_password = "password"
     sender_email = "sender@gmail.com"
 
-    users_response = httpx.get(f"http://{HOST}:{PORT}/users/")
+    users_response = httpx.get(f"http://{HOST}:{USER_PORT}/users/")
     users_data = users_response.json()
 
     for user in users_data:
