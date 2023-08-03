@@ -161,3 +161,4 @@ cython_debug/
 #.idea/
 
 /notifications.txt
+/user_service/article_count_notifications.txt
