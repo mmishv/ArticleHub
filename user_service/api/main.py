@@ -16,7 +16,7 @@ from .utils.token_utils import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTE
 
 from .utils.user_utils import get_user_by_email, authenticate_user, get_current_user
 from .crud_router import router as user_router
-from .celery_app import send_article_count_notifications
+from user_service.api.celery_app import send_article_count_notifications
 app = FastAPI()
 
 app.include_router(user_router)
